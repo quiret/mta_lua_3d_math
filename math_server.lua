@@ -3,10 +3,10 @@
 local do_print_math_debug = false;
 
 local viewFrustum = createViewFrustum(
-    createVector(0.08, -0.5, -0.7),
-    createVector(2, 0, 0),
-    createVector(0, 0, 2),
-    createVector(0, 1.5, 0)
+    createVector(0, 0, 3),
+    createVector(5, 0, 0),
+    createVector(0, 0, 5),
+    createVector(0, 20, 0)
 );
 
 local test_planes = {
@@ -364,7 +364,7 @@ local function task_draw_scene(thread)
     local time_start = getTickCount();
     
     for m,n in ipairs(test_planes) do
-        local gotToDraw, numDrawn, numSkipped = draw_plane_on_bbuf(bbuf, dbuf, n, true);
+        local gotToDraw, numDrawn, numSkipped = draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, n, true);
         
         if ( gotToDraw ) then
             outputDebugString( "drawn " .. numDrawn .. " pixels (skipped " .. numSkipped .. ")" );
