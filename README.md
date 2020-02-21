@@ -6,5 +6,5 @@ Uses Linear Algebra for software rendering 3D polygons. Comes with a RenderWare 
 Uses some code from other sources. Credit is given where it is due (i.e. StackOverflow).
 
 # Math calculation samples
-https://imgur.com/gallery/rLvln3X
-https://imgur.com/gallery/ffC08OT
+* https://imgur.com/gallery/rLvln3X
+* https://imgur.com/gallery/ffC08OT
