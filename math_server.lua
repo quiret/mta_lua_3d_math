@@ -80,6 +80,7 @@ local function create_backbuffer( width, height, alphaClear, redClear, greenClea
     
     return bbuf;
 end
+_G.create_backbuffer = create_backbuffer;
 
 -- Create a depth buffer, storing depth values of screen pixels.
 local function createDepthBuffer( width, height, clearValue )
@@ -100,6 +101,7 @@ local function createDepthBuffer( width, height, clearValue )
     
     return dbuf;
 end
+_G.createDepthBuffer = createDepthBuffer;
 
 -- Sets the color of a single pixel on the backbuffer, if possible.
 local function set_pixel_on_bbuf(bbuf, xpos, ypos, alpha, red, green, blue)
@@ -252,14 +254,6 @@ local function rasterize_intersection(inter, bbuf, cb)
             
             local block_diff_u_pixels = math.ceil( block_diff_u * bbuf.width );
             
-            if (block_diff_u_pixels > 220) then
-                outputConsole("pixels: " .. block_diff_u_pixels);
-                outputConsole("min_u: " .. min_u .. ", max_u: " .. max_u);
-                outputConsole("block_min_u: " .. block_min_u .. ", block_max_u: " .. block_max_u);
-                outputConsole("diff_v_pixels: " .. diff_v_pixels);
-                break;
-            end
-        
             local block_start_x = math.floor( block_min_u * bbuf.width );
         
             cb( n, block_start_x, abs_y, frustum_v, block_diff_u_pixels );
@@ -267,7 +261,7 @@ local function rasterize_intersection(inter, bbuf, cb)
     end
 end
 
-local function draw_plane_on_bbuf(bbuf, dbuf, plane, is_task, prim_type)
+local function draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, plane, is_task, prim_type)
     -- our screen is represented by viewFrustum, defined at the top.
     
     if (is_task) then
@@ -348,6 +342,7 @@ local function draw_plane_on_bbuf(bbuf, dbuf, plane, is_task, prim_type)
     
     return true, num_drawn_pixels, num_skipped_pixels;
 end
+_G.draw_plane_on_bbuf = draw_plane_on_bbuf;
 
 -- It is actually undocumented, but plain pixels have two unsigned shorts that define the
 -- size of the image at the tail.
@@ -359,6 +354,7 @@ local function num_to_ushort_bytes(num)
     
     return string.char(lower, upper);
 end
+_G.num_to_ushort_bytes = num_to_ushort_bytes;
 
 -- Draws a backbuffer and sends it in "plain" format to all clients.
 local function task_draw_scene(thread)
@@ -480,7 +476,7 @@ local function task_draw_model(thread)
             tv.setY(vert3.y - vert1.y);
             tv.setZ(vert3.z - vert1.z);
             
-            local gotToDraw, numDrawn, numSkipped = draw_plane_on_bbuf(bbuf, dbuf, triPlane, false, "tri");
+            local gotToDraw, numDrawn, numSkipped = draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, triPlane, false, "tri");
             
             if (gotToDraw) and (numDrawn >= 1) then
                 num_triangles_drawn = num_triangles_drawn + 1;
