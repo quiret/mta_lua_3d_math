@@ -193,7 +193,7 @@ local function rasterize_intersection(inter, bbuf, cb)
     end
     
     local function min_a1_interval(a1k1, a1k2, b1min, b1max)
-        assert(b1min <= b1max);
+        --assert(b1min <= b1max);
     
         if (_math_eq(a1k1, 0)) then
             return a1k2;
@@ -205,7 +205,7 @@ local function rasterize_intersection(inter, bbuf, cb)
     end
     
     local function max_a1_interval(a1k1, a1k2, b1min, b1max)
-        assert(b1min <= b1max);
+        --assert(b1min <= b1max);
     
         if (_math_eq(a1k1, 0)) then
             return a1k2;
