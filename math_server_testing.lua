@@ -52,6 +52,7 @@ local function frustum_unit_test()
     -- All those unit tests are verified math on paper.
     if (true) then
         -- 3D frustum-plane non-linear intersection - example #6
+        -- https://1drv.ms/u/s!Ao_bx9imD7B8hJ4U2BiAV2LY5lnkxA?e=cgvN1R
         local plane = createPlane(
             createVector( -2, 0, 2 ),
             createVector( 4, 0, 0 ),
@@ -91,6 +92,7 @@ local function frustum_unit_test()
     
     if (true) then
         -- 3D frustum plane non-linear intersection - example #7
+        -- https://1drv.ms/u/s!Ao_bx9imD7B8hJ4V1XdLo8fGTa5MXw?e=FEezxh
         local plane = createPlane(
             createVector(-3, 2, -3),
             createVector(4, 0, 0),
@@ -136,6 +138,7 @@ local function frustum_unit_test()
     
     if (true) then
         -- 3D frustum-plane non-linear intersection - example #8
+        -- https://1drv.ms/u/s!Ao_bx9imD7B8hJ4WfvqXobUac3GoGA?e=fytPRS
         local plane = createPlane(
             createVector(-2, 8, -2),
             createVector(1, 1, 0),
@@ -186,6 +189,7 @@ local function frustum_unit_test()
     
     if (true) then
         -- 3D frustum-triangle non-linear intersection - example #1
+        -- https://1drv.ms/u/s!Ao_bx9imD7B8hJ4TCbQ49eP2IDD7Sw?e=WYWd3t
         local plane = createPlane(
             createVector(-2, 6, -1),
             createVector(4, 0, 0),
@@ -223,6 +227,7 @@ local function frustum_unit_test()
     
     if (true) then
         -- 3D frustum-plane non-linear intesection - example #9
+        -- https://1drv.ms/u/s!Ao_bx9imD7B8hJ4SjRRGgkCfvrTfPg?e=Uw36JF
         local plane = createPlane(
             createVector(3, 4, 3),
             createVector(1, 0, 0),
