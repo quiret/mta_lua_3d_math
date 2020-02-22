@@ -14,7 +14,8 @@ After starting this resource you can execute the following commands for testing:
 
 ## External References
 
-* Forum Discussion: https://www.mta-sa.org/thread/38693-3d-frustum-ebene-schneidung-in-lua/
+* Forum Discussion (German): https://www.mta-sa.org/thread/38693-3d-frustum-ebene-schneidung-in-lua/
+* Forum Discussion (English): https://forum.mtasa.com/topic/122576-software-rendering-in-mtasa-lua/
 
 ## Math calculation samples
 * https://imgur.com/gallery/rLvln3X
