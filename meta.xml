@@ -12,6 +12,7 @@
     <script type="shared" src="mathcore/math_basiccond.lua" />
     <script type="shared" src="mathcore/math_condchains.lua" />
     <script type="shared" src="math_linearconds_2d.lua" />
+    <script type="shared" src="math_condtransform.lua" />
     <script type="shared" src="math_shared.lua"></script>
     <script type="client" src="math_client.lua"></script>
     <script type="server" src="math_server.lua"></script>
