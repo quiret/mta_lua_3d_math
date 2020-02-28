@@ -8,6 +8,10 @@
     <script type="shared" src="utilities_vendor.lua" />
     <script type="shared" src="rw_shared.lua" />
     <script type="server" src="rw_server.lua" />
+    <script type="shared" src="mathcore/math_utilities.lua" />
+    <script type="shared" src="mathcore/math_basiccond.lua" />
+    <script type="shared" src="mathcore/math_condchains.lua" />
+    <script type="shared" src="math_linearconds_2d.lua" />
     <script type="shared" src="math_shared.lua"></script>
     <script type="client" src="math_client.lua"></script>
     <script type="server" src="math_server.lua"></script>
