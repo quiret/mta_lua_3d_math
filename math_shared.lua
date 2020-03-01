@@ -909,11 +909,13 @@ function createViewFrustum(pos, right, up, front)
             return mcs_multsum({k1, k2, k3, k4}, {false, "a1*c1", "b1*c1", "c1"});
         end
         
-        -- First all cross conditions.
-        local a2solutions = {};
-        local b2solutions = {};
-        
+        -- Find solutions for a2 and b2.
+        local a2solution = false;
+        local b2solution = false;
+
         local function solveCrossCondition(p2a, p2b, u2a, u2b, v2a, v2b, p1a, p1b, u1a, u1b, v1a, v1b, w1a, w1b)
+            if (a2solution) then return false; end;
+            
             local det = det2(u2a, u2b, v2a, v2b);
             
             if not (det == 0) then
@@ -934,31 +936,27 @@ function createViewFrustum(pos, right, up, front)
                     output_math_debug( "b2 = " .. make_frustum_cond_string( b2c1, b2c2, b2c3, b2c4 ) );
                 end
                 
-                local a2solution = {};
+                a2solution = {};
                 a2solution.c1 = a2c1;
                 a2solution.c2 = a2c2;
                 a2solution.c3 = a2c3;
                 a2solution.c4 = a2c4;
                 
-                tinsert( a2solutions, a2solution );
-                
-                local b2solution = {};
+                b2solution = {};
                 b2solution.c1 = b2c1;
                 b2solution.c2 = b2c2;
                 b2solution.c3 = b2c3;
                 b2solution.c4 = b2c4;
-                
-                tinsert( b2solutions, b2solution );
-                
+
                 if (doPrintDebug) then
                     output_math_debug( "is a cross condition for (a2, b2)" );
                 end
+                
+                return true;
             end
+            
+            return false;
         end
-        
-        solveCrossCondition(p2x, p2y, u2x, u2y, v2x, v2y, p1x, p1y, u1x, u1y, v1x, v1y, w1x, w1y);
-        solveCrossCondition(p2x, p2z, u2x, u2z, v2x, v2z, p1x, p1z, u1x, u1z, v1x, v1z, w1x, w1z);
-        solveCrossCondition(p2y, p2z, u2y, u2z, v2y, v2z, p1y, p1z, u1y, u1z, v1y, v1z, w1y, w1z);
         
         -- 0 = k1*a1*c1 + k2*b1*c1 + k3*c1 + k4
         local function solveNonLinearDepthConditionEQ(k1, k2, k3, k4)
@@ -988,59 +986,47 @@ function createViewFrustum(pos, right, up, front)
             end
         end
         
-        local function solveDirectFrustumCondition(p2a, u2a, v2a, p1a, u1a, v1a, w1a)
-            if (_math_eq(u2a, 0)) and (_math_eq(v2a, 0)) then
-                solveNonLinearDepthConditionEQ(u1a, v1a, w1a, p1a - p2a);
-            end
-        end
-        
-        solveDirectFrustumCondition(p2x, u2x, v2x, p1x, u1x, v1x, w1x);
-        solveDirectFrustumCondition(p2y, u2y, v2y, p1y, u1y, v1y, w1y);
-        solveDirectFrustumCondition(p2z, u2z, v2z, p1z, u1z, v1z, w1z);
-        
-        if (doPrintDebug) then
-            output_math_debug( "STEP 2: disambiguate the plane coordinate solutions" );
-        end
-        
-        if (#a2solutions == 0) then return false; end;
-        if (#b2solutions == 0) then return false; end;
-        
-        local function reduceFrustumSolutions(sk1, sk2, sk3, sk4, osk1, osk2, osk3, osk4)
-            local k1 = (osk1 - sk1);
-            local k2 = (osk2 - sk2);
-            local k3 = (osk3 - sk3);
-            local k4 = (osk4 - sk4);
-            
-            solveNonLinearDepthConditionEQ( k1, k2, k3, k4 );
-        end
-        
-        local a2solution = a2solutions[1];
-        
-        if (#a2solutions > 1) then
+        if (solveCrossCondition(p2x, p2y, u2x, u2y, v2x, v2y, p1x, p1y, u1x, u1y, v1x, v1y, w1x, w1y)) then
             if (doPrintDebug) then
-                output_math_debug( "disambiguing a2" );
+                output_math_debug( "STEP 2: disambiguate the plane coordinate solutions (Z)" );
             end
             
-            for n=2,#a2solutions do
-                local a2othersolution = a2solutions[n];
-                
-                reduceFrustumSolutions( a2solution.c2, a2solution.c3, a2solution.c4, a2solution.c1, a2othersolution.c2, a2othersolution.c3, a2othersolution.c4, a2othersolution.c1 );
-            end
+            local k4 = ((p2z - p1z) + u2z*a2solution.c1 + v2z*b2solution.c1);
+            local k1 = (u2z*a2solution.c2 + v2z*b2solution.c2 - u1z);
+            local k2 = (u2z*a2solution.c3 + v2z*b2solution.c3 - v1z);
+            local k3 = (u2z*a2solution.c4 + v2z*b2solution.c4 - w1z);
+            
+            solveNonLinearDepthConditionEQ(k1, k2, k3, k4);
         end
         
-        local b2solution = b2solutions[1];
-        
-        if (#b2solutions > 1) then
+        if (solveCrossCondition(p2x, p2z, u2x, u2z, v2x, v2z, p1x, p1z, u1x, u1z, v1x, v1z, w1x, w1z)) then
             if (doPrintDebug) then
-                output_math_debug( "disambiguing b2" );
+                output_math_debug( "STEP 2: disambiguate the plane coordinate solutions (Y)" );
             end
             
-            for n=2,#b2solutions do
-                local b2othersolution = b2solutions[n];
-                
-                reduceFrustumSolutions( b2solution.c2, b2solution.c3, b2solution.c4, b2solution.c1, b2othersolution.c2, b2othersolution.c3, b2othersolution.c4, b2othersolution.c1 );
-            end
+            local k4 = ((p2y - p1y) + u2y*a2solution.c1 + v2y*b2solution.c1);
+            local k1 = (u2y*a2solution.c2 + v2y*b2solution.c2 - u1y);
+            local k2 = (u2y*a2solution.c3 + v2y*b2solution.c3 - v1y);
+            local k3 = (u2y*a2solution.c4 + v2y*b2solution.c4 - w1y);
+            
+            solveNonLinearDepthConditionEQ(k1, k2, k3, k4);
         end
+        
+        if (solveCrossCondition(p2y, p2z, u2y, u2z, v2y, v2z, p1y, p1z, u1y, u1z, v1y, v1z, w1y, w1z)) then
+            if (doPrintDebug) then
+                output_math_debug( "STEP 2: disambiguate the plane coordinate solutions (X)" );
+            end
+            
+            local k4 = ((p2x - p1x) + u2x*a2solution.c1 + v2x*b2solution.c1);
+            local k1 = (u2x*a2solution.c2 + v2x*b2solution.c2 - u1x);
+            local k2 = (u2x*a2solution.c3 + v2x*b2solution.c3 - v1x);
+            local k3 = (u2x*a2solution.c4 + v2x*b2solution.c4 - w1x);
+            
+            solveNonLinearDepthConditionEQ(k1, k2, k3, k4);
+        end
+        
+        if not (a2solution) then return false; end;
+        if not (b2solution) then return false; end;
         
         if (doPrintDebug) then
             output_math_debug( "STEP 3: generate all frustum conditions stemming from the two plane conditions" );

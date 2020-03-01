@@ -7,8 +7,21 @@ local function fpe(a, b)
 end
 
 local function fpe_quot4(a1, a2, a3, a4, b1, b2, b3, b4)
-    return (fpe(a1, b1) and fpe(a2, b2) and fpe(a3, b3) and fpe(a4, b4)) or
-              (fpe(-a1, b1) and fpe(-a2, b2) and fpe(-a3, b3) and fpe(-a4, b4));
+    if ( _math_eq(a4, 0) ) then
+        return _math_eq(b4, 0);
+    elseif ( _math_eq(b4, 0) ) then
+        return _math_eq(a4, 0);
+    end
+    
+    local d1a = a1/a4;
+    local d2a = a2/a4;
+    local d3a = a3/a4;
+    
+    local d1b = b1/b4;
+    local d2b = b2/b4;
+    local d3b = b3/b4;
+    
+    return fpe(d1a, d1b) and fpe(d2a, d2b) and fpe(d3a, d3b);
 end
 
 local function find_inter_result(
@@ -41,8 +54,10 @@ local function find_inter_result(
         end
     end
     
-    assert( found == true, "unit test fail" );
-    
+    if not ( found ) then
+        error( "unit test fail", 2 );
+    end
+
     if (output_debug_of_compare) then
         outputConsole("found");
     end
