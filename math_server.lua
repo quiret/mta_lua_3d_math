@@ -261,7 +261,7 @@ local function rasterize_intersection(inter, bbuf, cb)
     end
 end
 
-local function draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, plane, is_task, prim_type)
+local function draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, plane, is_task, prim_type, doDebugOverride)
     -- our screen is represented by viewFrustum, defined at the top.
     
     if (is_task) then
@@ -271,9 +271,9 @@ local function draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, plane, is_task, prim_
     local inter = false;
     
     if not (prim_type) or (prim_type == "plane") then
-        inter = viewFrustum.intersectWithPlane(plane, do_print_math_debug);
+        inter = viewFrustum.intersectWithPlane(plane, do_print_math_debug or doDebugOverride);
     elseif (prim_type == "tri") then
-        inter = viewFrustum.intersectWithTrianglePlane(plane, do_print_math_debug);
+        inter = viewFrustum.intersectWithTrianglePlane(plane, do_print_math_debug or doDebugOverride);
     end
     
     if not ( inter ) then

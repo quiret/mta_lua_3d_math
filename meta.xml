@@ -1,20 +1,22 @@
 <meta>
-    <info name="" type="util" author="The_GTA" version="1.0" description="3d frustum non-linear render example resource"></info>
-    <script type="shared" src="math_shared_absmirr.lua" />
-    <script type="shared" src="class.lua" />
-    <script type="shared" src="threads.lua" />
-    <script type="server" src="progress_feedback_server.lua" />
-    <script type="client" src="progress_feedback_client.lua" />
-    <script type="shared" src="utilities_vendor.lua" />
-    <script type="shared" src="rw_shared.lua" />
-    <script type="server" src="rw_server.lua" />
-    <script type="shared" src="mathcore/math_utilities.lua" />
-    <script type="shared" src="mathcore/math_basiccond.lua" />
-    <script type="shared" src="mathcore/math_condchains.lua" />
-    <script type="shared" src="math_linearconds_2d.lua" />
-    <script type="shared" src="math_condtransform.lua" />
+    <info type="util" name="" author="The_GTA" version="1.0" description="3d frustum non-linear render example resource"></info>
+    <script type="shared" src="math_shared_absmirr.lua"></script>
+    <script type="shared" src="class.lua"></script>
+    <script type="shared" src="threads.lua"></script>
+    <script type="server" src="progress_feedback_server.lua"></script>
+    <script type="client" src="progress_feedback_client.lua"></script>
+    <script type="shared" src="utilities_vendor.lua"></script>
+    <script type="shared" src="rw_shared.lua"></script>
+    <script type="server" src="rw_server.lua"></script>
+    <script type="shared" src="mathcore/math_utilities.lua"></script>
+    <script type="shared" src="mathcore/math_basiccond.lua"></script>
+    <script type="shared" src="mathcore/math_condchains.lua"></script>
+    <script type="shared" src="math_linearconds_2d.lua"></script>
+    <script type="shared" src="math_condtransform.lua"></script>
     <script type="shared" src="math_shared.lua"></script>
     <script type="client" src="math_client.lua"></script>
     <script type="server" src="math_server.lua"></script>
-    <script type="server" src="math_server_testing.lua" />
+    <script type="server" src="math_server_testing.lua"></script>
+    <script type="client" src="reqdebugdraw_client.lua"></script>
+    <script type="server" src="reqdebugdraw_server.lua"></script>
 </meta>

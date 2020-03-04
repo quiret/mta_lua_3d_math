@@ -10,7 +10,7 @@ local _G = _G;
 -- There is a long history of CPU's not accurately implementing floating-point mathematics.
 -- In the end you could only trust the "<" and ">" operators to be accurate.
 -- That is why these functions were used.
-local _epsilon = 0.00000001;
+local _epsilon = 0.000001;
 
 local function _math_leq(a, b)
     return ( a - _epsilon <= b );
