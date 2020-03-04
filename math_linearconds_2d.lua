@@ -15,50 +15,46 @@ if not (_math_eq) or not (_math_geq) or not (_math_leq) or
    not (output_math_debug) or not (createConditionBoolean) or
    not (mcs_multsum) then
    
-	error("cannot import global function; fatal script error.");
+    error("cannot import global function; fatal script error.");
 end
 
 -- 0 = a1*k1 + b1*k2 + k3
 local function createCondition2DLinearEquality(k1, k2, k3)
+    -- Pre-calculate the conditional object.
+    local c1, c2;
+    local solutionType;
+    
+    if not (_math_eq(k1, 0)) then
+        solutionType = "a1equal";
+        c1 = (-k2)/k1;
+        c2 = (-k3)/k1;
+    elseif not (_math_eq(k2, 0)) then
+        solutionType = "b1equal";
+        c1 = (-k3)/k2;
+    else
+        return createConditionBoolean( _math_eq(k3, 0) );
+    end
+    
     local cond = {};
     
     function cond.getSolutionType()
-        if not (_math_eq(k1, 0)) then
-            return "a1equal";
-        elseif not (_math_eq(k2, 0)) then
-            return "b1equal";
-        end
-        
-        return "boolean";
+        return solutionType;
     end
     
     function cond.solve()
-        if not (_math_eq(k1, 0)) then
-            local c1 = (-k2)/k1;
-            local c2 = (-k3)/k1;
-            
+        if (solutionType == "a1equal") then
             -- a1 = c1*b1 + c2
             return c1, c2;
-        elseif not (_math_eq(k2, 0)) then
-            local c1 = (-k3)/k2;
-            
+        elseif (solutionType == "b1equal") then
             -- b1 = c1
             return c1;
-        else
-            -- boolean
-            return ( _math_eq(k3, 0) );
         end
     end
     
     function cond.toStringEQ()
-        local solutionType = cond.getSolutionType();
-        local c1, c2 = cond.solve();
-        
         if (solutionType == "a1equal") then
             return mcs_multsum({c1, c2}, {"b1"});
         elseif (solutionType == "b1equal") then
-            return tostring( c1 );
-        elseif (solutionType == "boolean") then
             return tostring( c1 );
         end
         
@@ -66,14 +62,10 @@ local function createCondition2DLinearEquality(k1, k2, k3)
     end
     
     function cond.toString()
-        local solutionType = cond.getSolutionType();
-        
         if (solutionType == "a1equal") then
             return "a1 = " .. cond.toStringEQ();
         elseif (solutionType == "b1equal") then
             return "b1 = " .. cond.toStringEQ();
-        elseif (solutionType == "boolean") then
-            return tostring( cond.solve() );
         end
         
         return "unknown";
@@ -213,44 +205,41 @@ _G.createCondition2DLinearEquality = createCondition2DLinearEquality;
 
 -- 0 != a1*k1 + b1*k2 + k3
 function createCondition2DLinearInequalityNEQ(k1, k2, k3)
+    -- Pre-calculate the condition.
+    local c1, c2;
+    local solutionType;
+    
+    if not (_math_eq(k1, 0)) then
+        solutionType = "a1nequal";
+        c1 = (-k2)/k1;
+        c2 = (-k3)/k1;
+    elseif not (_math_eq(k2, 0)) then
+        solutionType = "b1nequal";
+        c1 = (-k3)/k2;
+    else
+        return createConditionBoolean( not _math_eq(k3, 0) );
+    end
+    
     local cond = {};
     
     function cond.getSolutionType()
-        if not (_math_eq(k1, 0)) then
-            return "a1nequal";
-        elseif not (_math_eq(k2, 0)) then
-            return "b1nequal";
-        else
-            return "boolean";
-        end
+        return solutionType;
     end
     
     function cond.solve()
-        if not (_math_eq(k1, 0)) then
-            local c1 = (-k2)/k1;
-            local c2 = (-k3)/k1;
-            
+        if (solutionType == "a1nequal") then
             -- a1 != b1*c1 + c2
             return c1, c2;
-        elseif not (_math_eq(k2, 0)) then
-            local c1 = (-k3)/k2;
-            
+        elseif (solutionType == "b1nequal") then
             -- b1 != c1
             return c1;
-        else
-            return not ( _math_eq(k3, 0) );
         end
     end
     
     function cond.toStringEQ()
-        local solutionType = cond.getSolutionType();
-        local c1, c2 = cond.solve();
-        
         if (solutionType == "a1nequal") then
             return mcs_multsum({c1, c2}, {"b1"});
         elseif (solutionType == "b1nequal") then
-            return tostring( c1 );
-        elseif (solutionType == "boolean") then
             return tostring( c1 );
         end
         
@@ -258,14 +247,10 @@ function createCondition2DLinearInequalityNEQ(k1, k2, k3)
     end
     
     function cond.toString()
-        local solutionType = cond.getSolutionType();
-        
         if (solutionType == "a1nequal") then
             return "a1 != " .. cond.toStringEQ();
         elseif (solutionType == "b1nequal") then
             return "b1 != " .. cond.toStringEQ();
-        elseif (solutionType == "boolean") then
-            return cond.toStringEQ();
         end
         
         return "unknown";
@@ -338,48 +323,55 @@ end
 
 -- 0 < a1*k1 + b1*k2 + k3
 local function createCondition2DLinearInequalityLT(k1, k2, k3)
+    -- Pre-calculate the condition.
+    local solutionType;
+    local is_a1_bound = false;
+    local is_b1_bound = false;
+    local c1, c2;
+    
+    if not (_math_eq(k1, 0)) then
+        if (k1 > 0) then
+            solutionType = "a1inferior";
+        else
+            solutionType = "a1superior";
+        end
+        
+        is_a1_bound = true;
+        c1 = (-k2)/k1;
+        c2 = (-k3)/k1;
+    elseif not (_math_eq(k2, 0)) then
+        if (k2 > 0) then
+            solutionType = "b1inferior";
+        else
+            solutionType = "b1superior";
+        end
+        
+        is_b1_bound = true;
+        c1 = (-k3)/k2;
+    else
+        return createConditionBoolean( 0 < k3 );
+    end
+    
     local cond = {};
     
     function cond.getSolutionType()
-        if (k1 > 0) then
-            return "a1inferior";
-        elseif (k1 < 0) then
-            return "a1superior";
-        elseif (k2 > 0) then
-            return "b1inferior";
-        elseif (k2 < 0) then
-            return "b1superior";
-        else
-            return "boolean";
-        end
+        return solutionType;
     end
     
     function cond.solve()
-        if not (_math_eq(k1, 0)) then
-            local c1 = (-k2)/k1;
-            local c2 = (-k3)/k1;
-            
+        if (is_a1_bound) then
             -- a1 </> c1*b1 + c2
             return c1, c2;
-        elseif not (_math_eq(k2, 0)) then
-            local c1 = (-k3)/k2;
-            
+        elseif (is_b1_bound) then
             -- b1 </> c1
             return c1;
-        else
-            return ( 0 < k3 );
         end
     end
     
     function cond.toStringEQ()
-        local solutionType = cond.getSolutionType();
-        local c1, c2 = cond.solve();
-        
         if (solutionType == "a1superior") or (solutionType == "a1inferior") then
             return mcs_multsum({c1, c2}, {"b1"});
         elseif (solutionType == "b1superior") or (solutionType == "b1inferior") then
-            return tostring( c1 );
-        elseif (solutionType == "boolean") then
             return tostring( c1 );
         end
         
@@ -387,8 +379,6 @@ local function createCondition2DLinearInequalityLT(k1, k2, k3)
     end
     
     function cond.toString()
-        local solutionType = cond.getSolutionType();
-        
         if (solutionType == "a1superior") then
             return "a1 < " .. cond.toStringEQ();
         elseif (solutionType == "a1inferior") then
@@ -397,8 +387,6 @@ local function createCondition2DLinearInequalityLT(k1, k2, k3)
             return "b1 < " .. cond.toStringEQ();
         elseif (solutionType == "b1inferior") then
             return "b1 > " .. cond.toStringEQ();
-        elseif (solutionType == "boolean") then
-            return tostring( cond.solve() );
         end
         
         return "unknown";
@@ -477,48 +465,55 @@ _G.createCondition2DLinearInequalityLT = createCondition2DLinearInequalityLT;
 
 -- 0 <= a1*k1 + b1*k2 + k3
 local function createCondition2DLinearInequalityLTEQ(k1, k2, k3)
+    -- Pre-calculate the condition.
+    local solutionType;
+    local is_a1_bound = false;
+    local is_b1_bound = false;
+    local c1, c2;
+    
+    if not (_math_eq(k1, 0)) then
+        if (k1 > 0) then
+            solutionType = "a1min";
+        else
+            solutionType = "a1max";
+        end
+        
+        is_a1_bound = true;
+        c1 = (-k2)/k1;
+        c2 = (-k3)/k1;
+    elseif not (_math_eq(k2, 0)) then
+        if (k2 > 0) then
+            solutionType = "b1min";
+        else
+            solutionType = "b1max";
+        end
+        
+        is_b1_bound = true;
+        c1 = (-k3)/k2;
+    else
+        return createConditionBoolean( _math_leq(0, k3) );
+    end
+    
     local cond = {};
 
     function cond.getSolutionType()
-        if (k1 > 0) then
-            return "a1min";
-        elseif (k1 < 0) then
-            return "a1max";
-        elseif (k2 > 0) then
-            return "b1min";
-        elseif (k2 < 0) then
-            return "b1max";
-        else
-            return "boolean";
-        end
+        return solutionType;
     end
     
     function cond.solve()
-        if not (_math_eq(k1, 0)) then
-            local c1 = (-k2)/k1;
-            local c2 = (-k3)/k1;
-            
+        if (is_a1_bound) then
             -- a1 </>= c1*b1 + c2
             return c1, c2;
-        elseif not (_math_eq(k2, 0)) then
-            local c1 = (-k3)/k2;
-            
+        elseif (is_b1_bound) then
             -- b1 </>= c1
             return c1;
-        else
-            return ( _math_leq(0, k3) );
         end
     end
     
     function cond.toStringEQ()
-        local solutionType = cond.getSolutionType();
-        local c1, c2 = cond.solve();
-        
         if (solutionType == "a1max") or (solutionType == "a1min") then
             return mcs_multsum({c1, c2}, {"b1"});
         elseif (solutionType == "b1max") or (solutionType == "b1min") then
-            return tostring( c1 );
-        elseif (solutionType == "boolean") then
             return tostring( c1 );
         end
         
@@ -526,8 +521,6 @@ local function createCondition2DLinearInequalityLTEQ(k1, k2, k3)
     end
 
     function cond.toString()
-        local solutionType = cond.getSolutionType();
-        
         if (solutionType == "a1max") then
             return "a1 <= " .. cond.toStringEQ();
         elseif (solutionType == "a1min") then
