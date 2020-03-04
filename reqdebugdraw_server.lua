@@ -6,17 +6,18 @@ local function task_draw_current_scene(thread, tri_pos_x, tri_pos_y, tri_pos_z, 
     do
         local trifile = "debug_tri_draw.lua";
         local tricode =
-            "local triangle = createTriangle(\n" ..
+            "local triangle = createPlane(\n" ..
             "    createVector(" .. tri_pos_x .. ", " .. tri_pos_y .. ", " .. tri_pos_z .. "),\n" ..
             "    createVector(" .. tri_u_x .. ", " .. tri_u_y .. ", " .. tri_u_z .. "),\n" ..
             "    createVector(" .. tri_v_x .. ", " .. tri_v_y .. ", " .. tri_v_z .. ")\n" ..
             ");\n" ..
-            "local frustum = createTriangle(\n" ..
+            "local frustum = createViewFrustum(\n" ..
             "    createVector(" .. frustum_pos_x .. ", " .. frustum_pos_y .. ", " .. frustum_pos_z .. "),\n" ..
             "    createVector(" .. frustum_right_x .. ", " .. frustum_right_y .. ", " .. frustum_right_z .. "),\n" ..
             "    createVector(" .. frustum_up_x .. ", " .. frustum_up_y .. ", " .. frustum_up_z .. "),\n" ..
             "    createVector(" .. frustum_front_x .. ", " .. frustum_front_y .. ", " .. frustum_front_z .. ")\n" ..
-            ");";
+            ");\n" ..
+            "local primType = \"tri\";";
         
         if (fileExists(trifile)) then
             fileDelete(trifile);

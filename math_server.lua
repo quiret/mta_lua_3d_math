@@ -234,12 +234,11 @@ local function rasterize_intersection(inter, bbuf, cb)
         
         local diff_v_pixels = math.ceil(diff_v * bbuf.height);
         
-        local start_y = min_v * bbuf.height;
-        start_y = math.floor(start_y);
+        local start_y = math.floor(min_v * bbuf.height);
         
         for y=0,diff_v_pixels-1,1 do
             local abs_y = ( start_y + y );
-            local abs_v = math.max(math.min( abs_y / bbuf.height, max_v), min_v);
+            local abs_v = math.max(math.min(abs_y / bbuf.height, max_v), min_v);
 
             -- Since we know the dimensions of the to-be-drawn surface we can process by scan-lines.
             local frustum_v = to_frustum_coord(abs_v);
@@ -262,8 +261,6 @@ local function rasterize_intersection(inter, bbuf, cb)
 end
 
 local function draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, plane, is_task, prim_type, doDebugOverride)
-    -- our screen is represented by viewFrustum, defined at the top.
-    
     if (is_task) then
         taskUpdate(false, "calculating intersection");
     end
@@ -340,7 +337,7 @@ local function draw_plane_on_bbuf(viewFrustum, bbuf, dbuf, plane, is_task, prim_
         rasterize_intersection(inter, bbuf, draw_row);
     end
     
-    return true, num_drawn_pixels, num_skipped_pixels;
+    return true, num_drawn_pixels, num_skipped_pixels, max_pixels;
 end
 _G.draw_plane_on_bbuf = draw_plane_on_bbuf;
 

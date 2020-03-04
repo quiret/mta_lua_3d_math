@@ -113,8 +113,14 @@ local function createCondition2DLinearEquality(k1, k2, k3)
                 
                 return createCondition2DLinearInequalityLTEQ( 0, k1rb - k1rl, k2rb - k2rl );
             elseif (otherSolutionType == "a1equal") then
-                -- Meow. We assume that if both are equal then both are valid. Could be a very evil assumption!
-                return createConditionBoolean(true);
+                local k1a, k2a = cond.solve();
+                local k1b, k2b = otherCond.solve();
+                
+                if (doPrintDebug) then
+                    output_math_debug( "REDUCE: " .. cond.toStringEQ() .. " = " .. otherCond.toStringEQ() );
+                end
+                
+                return createCondition2DLinearEquality( 0, k1a - k1b, k2a - k2b );
             end
         elseif (ourSolutionType == "b1equal") then
             if (otherSolutionType == "b1min") then
@@ -158,7 +164,7 @@ local function createCondition2DLinearEquality(k1, k2, k3)
                 local k1b = otherCond.solve();
                 
                 if (doPrintDebug) then
-                    output_math_debug( "DISAMBCHECK: " .. cond.toStringEQ() .. " = " .. otherCond.toStringEQ() );
+                    output_math_debug( "REDUCE: " .. cond.toStringEQ() .. " = " .. otherCond.toStringEQ() );
                 end
                 
                 return createConditionBoolean(_math_eq(k1a, k1b));
@@ -166,35 +172,6 @@ local function createCondition2DLinearEquality(k1, k2, k3)
         end
         
         math_assert( false, "DISAMB ERROR: " .. ourSolutionType .. " and " .. otherSolutionType );
-        
-        return false;
-    end
-    
-    function cond.reduce(otherCond, doPrintDebug)
-        local ourSolutionType = cond.getSolutionType();
-        local otherSolutionType = otherCond.getSolutionType();
-        
-        if (ourSolutionType == "a1equal") and (otherSolutionType == "a1equal") then
-            local k1a, k2a = cond.solve();
-            local k1b, k2b = otherCond.solve();
-            
-            if (doPrintDebug) then
-                output_math_debug( "REDUCE: " .. cond.toStringEQ() .. " == " .. otherCond.toStringEQ() );
-            end
-            
-            return createCondition2DLinearEquality( 0, k1a - k1b, k2a - k2b );
-        elseif (ourSolutionType == "b1equal") and (otherSolutionType == "b1equal") then
-            local k1a = cond.solve();
-            local k1b = otherCond.solve();
-            
-            if (doPrintDebug) then
-                output_math_debug( "REDUCE: " .. cond.toStringEQ() .. " == " .. otherCond.toStringEQ() );
-            end
-            
-            return createConditionBoolean( _math_eq(k1a, k1b) );
-        end
-        
-        output_math_debug( "REDUCE ERROR: " .. ourSolutionType .. " and " .. otherSolutionType );
         
         return false;
     end

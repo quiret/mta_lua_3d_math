@@ -19,4 +19,5 @@
     <script type="server" src="math_server_testing.lua"></script>
     <script type="client" src="reqdebugdraw_client.lua"></script>
     <script type="server" src="reqdebugdraw_server.lua"></script>
+    <script type="server" src="single_test_draw.lua"></script>
 </meta>
