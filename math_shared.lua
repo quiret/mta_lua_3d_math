@@ -233,8 +233,17 @@ local function helperCreateCondition3DLinearInequalityCompareLTEQ( k1l, k2l, k3l
 end
 
 -- c1 >= k4 / ( k1*a1 + k2*b1 + k3 )
-function createConditionC13DLowerBound(k1, k2, k3, k4, parameter)
+function createConditionC13DLowerBoundNonNeg(k1, k2, k3, k4, parameter)
     assert( not (parameter == nil), "parameter is nil" );
+    
+    if not (_math_eq(k4, 0)) then
+        if (k4 < 0) and (parameter == "pos") or
+           (k4 > 0) and (parameter == "neg") then
+           
+           -- Shorten out some stupid conditions.
+           return createConditionBoolean(true);
+        end
+    end
     
     local cond = {};
     
@@ -305,8 +314,17 @@ function createConditionC13DLowerBound(k1, k2, k3, k4, parameter)
     return cond;
 end
 
-function createConditionC13DUpperBound(k1, k2, k3, k4, parameter)
+function createConditionC13DUpperBoundNonNeg(k1, k2, k3, k4, parameter)
     assert( not (parameter == nil), "parameter is nil" );
+    
+    if not (_math_eq(k4, 0)) then
+        if (k4 < 0) and (parameter == "pos") or
+           (k4 > 0) and (parameter == "neg") then
+           
+           -- Shorten out some stupid conditions.
+           return createConditionBoolean(false);
+        end
+    end
     
     local cond = {};
     
@@ -1061,8 +1079,8 @@ function createViewFrustum(pos, right, up, front)
                     local sub_andCond = createConditionAND();
                     
                     sub_andCond.addVar( createCondition2DLinearInequalityLT( k1, k2, k3 ) );
-                    sub_andCond.addVar( createConditionC13DLowerBound( k1, k2, k3, -k4, "pos" ) );
-                    sub_andCond.addVar( createConditionC13DUpperBound( k1, k2, k3, 1 - k4, "pos" ) );
+                    sub_andCond.addVar( createConditionC13DLowerBoundNonNeg( k1, k2, k3, -k4, "pos" ) );
+                    sub_andCond.addVar( createConditionC13DUpperBoundNonNeg( k1, k2, k3, 1 - k4, "pos" ) );
                     
                     orCond.addVar( sub_andCond );
                 end
@@ -1071,8 +1089,8 @@ function createViewFrustum(pos, right, up, front)
                     local sub_andCond = createConditionAND();
                     
                     sub_andCond.addVar( createCondition2DLinearInequalityLT( -k1, -k2, -k3 ) );
-                    sub_andCond.addVar( createConditionC13DLowerBound( k1, k2, k3, 1 - k4, "neg" ) );
-                    sub_andCond.addVar( createConditionC13DUpperBound( k1, k2, k3, - k4, "neg" ) );
+                    sub_andCond.addVar( createConditionC13DLowerBoundNonNeg( k1, k2, k3, 1 - k4, "neg" ) );
+                    sub_andCond.addVar( createConditionC13DUpperBoundNonNeg( k1, k2, k3, - k4, "neg" ) );
                     
                     orCond.addVar( sub_andCond );
                 end
@@ -1093,9 +1111,9 @@ function createViewFrustum(pos, right, up, front)
         
         -- Collection of the default frustum bounds.
         -- c1 >= 0
-        globalconds.establishAND(createConditionC13DLowerBound( 0, 0, 1, 0, "pos" ));
+        globalconds.establishAND(createConditionC13DLowerBoundNonNeg( 0, 0, 1, 0, "pos" ));
         -- c1 <= 1
-        globalconds.establishAND( createConditionC13DUpperBound( 0, 0, 1, 1, "pos" ) );
+        globalconds.establishAND( createConditionC13DUpperBoundNonNeg( 0, 0, 1, 1, "pos" ) );
         -- a1 >= -1
         globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 1, 0, 1 ) );
         -- a1 <= 1
@@ -1138,7 +1156,7 @@ function createViewFrustum(pos, right, up, front)
                         local sub_cond = createConditionAND();
                         
                         sub_cond.addVar(createCondition2DLinearInequalityLT(k1, k2, k3));
-                        sub_cond.addVar(createConditionC13DLowerBound(k1, k2, k3, -k4, "pos"));
+                        sub_cond.addVar(createConditionC13DLowerBoundNonNeg(k1, k2, k3, -k4, "pos"));
                         
                         orCond.addVar(sub_cond);
                     end
@@ -1147,7 +1165,7 @@ function createViewFrustum(pos, right, up, front)
                         local sub_cond = createConditionAND();
                         
                         sub_cond.addVar(createCondition2DLinearInequalityLT(-k1, -k2, -k3));
-                        sub_cond.addVar(createConditionC13DUpperBound(k1, k2, k3, -k4, "neg"));
+                        sub_cond.addVar(createConditionC13DUpperBoundNonNeg(k1, k2, k3, -k4, "neg"));
                         
                         orCond.addVar(sub_cond);
                     end
@@ -1179,9 +1197,9 @@ function createViewFrustum(pos, right, up, front)
         
         -- Collection of the default frustum bounds.
         -- c1 >= 0
-        globalconds.establishAND(createConditionC13DLowerBound( 0, 0, 1, 0, "pos" ));
+        globalconds.establishAND(createConditionC13DLowerBoundNonNeg( 0, 0, 1, 0, "pos" ));
         -- c1 <= 1
-        globalconds.establishAND( createConditionC13DUpperBound( 0, 0, 1, 1, "pos" ) );
+        globalconds.establishAND( createConditionC13DUpperBoundNonNeg( 0, 0, 1, 1, "pos" ) );
         -- a1 >= -1
         globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 1, 0, 1 ) );
         -- a1 <= 1

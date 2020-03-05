@@ -355,8 +355,8 @@ local function tools_unit_test()
             do
                 local andCond = createConditionAND();
                 
-                andCond.addVar(createConditionC13DLowerBound(0, 0, 1, 0, "pos"));
-                andCond.addVar(createConditionC13DUpperBound(0, 0, 1, 1, "pos"));
+                andCond.addVar(createConditionC13DLowerBoundNonNeg(0, 0, 1, 0, "pos"));
+                andCond.addVar(createConditionC13DUpperBoundNonNeg(0, 0, 1, 1, "pos"));
                 andCond.addVar(createCondition2DLinearEquality(1, 0, 0));
                 andCond.addVar(createCondition2DLinearEquality(0, -1, 2/3));
                 
@@ -381,8 +381,8 @@ local function tools_unit_test()
                     do
                         local subsub_andCond = createConditionAND();
                         
-                        subsub_andCond.addVar(createConditionC13DLowerBound(0, 0, 1, 0, "pos"));
-                        subsub_andCond.addVar(createConditionC13DUpperBound(3/2, 0, 0, 1/2, "pos"));
+                        subsub_andCond.addVar(createConditionC13DLowerBoundNonNeg(0, 0, 1, 0, "pos"));
+                        subsub_andCond.addVar(createConditionC13DUpperBoundNonNeg(3/2, 0, 0, 1/2, "pos"));
                         subsub_andCond.addVar(createCondition2DLinearInequalityLTEQ(1, 0, -1/3));
                         
                         sub_orCond.addVar(subsub_andCond);
@@ -391,8 +391,8 @@ local function tools_unit_test()
                     do
                         local subsub_andCond = createConditionAND();
                         
-                        subsub_andCond.addVar(createConditionC13DLowerBound(0, 0, 1, 0, "pos"));
-                        subsub_andCond.addVar(createConditionC13DUpperBound(0, 0, 1, 1, "pos"));
+                        subsub_andCond.addVar(createConditionC13DLowerBoundNonNeg(0, 0, 1, 0, "pos"));
+                        subsub_andCond.addVar(createConditionC13DUpperBoundNonNeg(0, 0, 1, 1, "pos"));
                         subsub_andCond.addVar(createCondition2DLinearInequalityLTEQ(-1, 0, 1/3));
                         
                         sub_orCond.addVar(subsub_andCond);
@@ -425,8 +425,8 @@ local function tools_unit_test()
                     do
                         local subsub_andCond = createConditionAND();
                         
-                        subsub_andCond.addVar(createConditionC13DLowerBound(0, 0, 1, 0, "pos"));
-                        subsub_andCond.addVar(createConditionC13DUpperBound(3/2, 0, 0, -1/2, "neg"));
+                        subsub_andCond.addVar(createConditionC13DLowerBoundNonNeg(0, 0, 1, 0, "pos"));
+                        subsub_andCond.addVar(createConditionC13DUpperBoundNonNeg(3/2, 0, 0, -1/2, "neg"));
                         subsub_andCond.addVar(createCondition2DLinearInequalityLTEQ(-1, 0, -1/3));
                         
                         sub_orCond.addVar(subsub_andCond);
@@ -435,8 +435,8 @@ local function tools_unit_test()
                     do
                         local subsub_andCond = createConditionAND();
                         
-                        subsub_andCond.addVar(createConditionC13DLowerBound(0, 0, 1, 0, "pos"));
-                        subsub_andCond.addVar(createConditionC13DUpperBound(0, 0, 1, 1, "pos"));
+                        subsub_andCond.addVar(createConditionC13DLowerBoundNonNeg(0, 0, 1, 0, "pos"));
+                        subsub_andCond.addVar(createConditionC13DUpperBoundNonNeg(0, 0, 1, 1, "pos"));
                         subsub_andCond.addVar(createCondition2DLinearInequalityLTEQ(1, 0, 1/3));
                         
                         sub_orCond.addVar(subsub_andCond);
