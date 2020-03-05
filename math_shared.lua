@@ -132,7 +132,7 @@ local function _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, 
     local c2 = (k4b*k2l - k4l*k2b);
     local c3 = (k4b*k3l - k4l*k3b);
     
-    return createCondition2DLinearInequalityLTEQ( c1, c2, c3 );
+    return createCondition2DLinearInequalityLTEQ, c1, c2, c3;
 end
 
 local function _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b )
@@ -140,7 +140,7 @@ local function _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, 
     local c2 = (k4l*k2b - k4b*k2l);
     local c3 = (k4l*k3b - k4b*k3l);
     
-    return createCondition2DLinearInequalityLTEQ( c1, c2, c3 );
+    return createCondition2DLinearInequalityLTEQ, c1, c2, c3;
 end
 
 local function helperCreateCondition3DLinearInequalityCompareLTEQ( k1l, k2l, k3l, k4l, lparam, k1b, k2b, k3b, k4b, bparam )
@@ -156,20 +156,22 @@ local function helperCreateCondition3DLinearInequalityCompareLTEQ( k1l, k2l, k3l
     end
 
     if ((lparam == "pos") and (bparam == "pos")) or ((lparam == "neg") and (bparam == "neg")) then
-        return _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b );
+        local constructor, c1, c2, c3 = _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b );
+        return constructor( c1, c2, c3 );
     elseif ((lparam == "neg") and (bparam == "pos")) or ((lparam == "pos") and (bparam == "neg")) then
-        return _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b );
+        local constructor, c1, c2, c3 = _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b );
+        return constructor( c1, c2, c3 );
     elseif (lparam == "unk") then
         if (bparam == "pos") then
             local orCond = createConditionOR();
             
             local firstCase = createConditionAND();
-            firstCase.addVar( createCondition2DLinearInequalityLT( k1l, k2l, k3l ) );
-            firstCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            firstCase.addCond( createCondition2DLinearInequalityLT, k1l, k2l, k3l );
+            firstCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             local secondCase = createConditionAND();
-            secondCase.addVar( createCondition2DLinearInequalityLT( -k1l, -k2l, -k3l ) );
-            secondCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            secondCase.addCond( createCondition2DLinearInequalityLT, -k1l, -k2l, -k3l );
+            secondCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             orCond.addVar( firstCase );
             orCond.addVar( secondCase );
@@ -179,12 +181,12 @@ local function helperCreateCondition3DLinearInequalityCompareLTEQ( k1l, k2l, k3l
             local orCond = createConditionOR();
             
             local firstCase = createConditionAND();
-            firstCase.addVar( createCondition2DLinearInequalityLT( -k1l, -k2l, -k3l ) );
-            firstCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            firstCase.addCond( createCondition2DLinearInequalityLT, -k1l, -k2l, -k3l );
+            firstCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             local secondCase = createConditionAND();
-            secondCase.addVar( createCondition2DLinearInequalityLT( k1l, k2l, k3l ) );
-            secondCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            secondCase.addCond( createCondition2DLinearInequalityLT, k1l, k2l, k3l );
+            secondCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             orCond.addVar( firstCase );
             orCond.addVar( secondCase );
@@ -198,12 +200,12 @@ local function helperCreateCondition3DLinearInequalityCompareLTEQ( k1l, k2l, k3l
             local orCond = createConditionOR();
             
             local firstCase = createConditionAND();
-            firstCase.addVar( createCondition2DLinearInequalityLT( k1b, k2b, k3b ) );
-            firstCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            firstCase.addCond( createCondition2DLinearInequalityLT, k1b, k2b, k3b );
+            firstCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             local secondCase = createConditionAND();
-            secondCase.addVar( createCondition2DLinearInequalityLT( -k1b, -k2b, -k3b ) );
-            secondCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            secondCase.addCond( createCondition2DLinearInequalityLT, -k1b, -k2b, -k3b );
+            secondCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             orCond.addVar( firstCase );
             orCond.addVar( secondCase );
@@ -213,12 +215,12 @@ local function helperCreateCondition3DLinearInequalityCompareLTEQ( k1l, k2l, k3l
             local orCond = createConditionOR();
             
             local firstCase = createConditionAND();
-            firstCase.addVar( createCondition2DLinearInequalityLT( -k1b, -k2b, -k3b ) );
-            firstCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            firstCase.addCond( createCondition2DLinearInequalityLT, -k1b, -k2b, -k3b );
+            firstCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_pospos( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             local secondCase = createConditionAND();
-            secondCase.addVar( createCondition2DLinearInequalityLT( k1b, k2b, k3b ) );
-            secondCase.addVar( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
+            secondCase.addCond( createCondition2DLinearInequalityLT, k1b, k2b, k3b );
+            secondCase.addCond( _helperCreateCondition3DLinearInequalityCompareLTEQ_posneg( k1l, k2l, k3l, k4l, k1b, k2b, k3b, k4b ) );
             
             orCond.addVar( firstCase );
             orCond.addVar( secondCase );
@@ -981,14 +983,14 @@ function createViewFrustum(pos, right, up, front)
             local orCond = createConditionOR();
             
             if (_math_eq(k4, 0)) then
-                orCond.addVar( createCondition2DLinearEquality( k1, k2, k3 ) );
+                orCond.addCond( createCondition2DLinearEquality, k1, k2, k3 );
             end
 
             do
                 local sub_andCond = createConditionAND();
                 
-                --sub_andCond.addVar( createCondition2DLinearInequalityNEQ( k1, k2, k3 ) ); encapsulation of != 0
-                sub_andCond.addVar( createConditionC13DEqualityNonNeg( k1, k2, k3, -k4 ) );
+                --sub_andCond.addCond( createCondition2DLinearInequalityNEQ, k1, k2, k3 ); encapsulation of != 0
+                sub_andCond.addCond( createConditionC13DEqualityNonNeg, k1, k2, k3, -k4 );
                 
                 orCond.addVar( sub_andCond );
             end
@@ -1072,15 +1074,15 @@ function createViewFrustum(pos, right, up, front)
                 local orCond = createConditionOR();
                 
                 if (_math_geq(k4, 0)) and (_math_geq(1 - k4, 0)) then
-                    orCond.addVar( createCondition2DLinearEquality( k1, k2, k3 ) );
+                    orCond.addCond( createCondition2DLinearEquality, k1, k2, k3 );
                 end
                 
                 do
                     local sub_andCond = createConditionAND();
                     
-                    sub_andCond.addVar( createCondition2DLinearInequalityLT( k1, k2, k3 ) );
-                    sub_andCond.addVar( createConditionC13DLowerBoundNonNeg( k1, k2, k3, -k4, "pos" ) );
-                    sub_andCond.addVar( createConditionC13DUpperBoundNonNeg( k1, k2, k3, 1 - k4, "pos" ) );
+                    sub_andCond.addCond( createCondition2DLinearInequalityLT, k1, k2, k3 );
+                    sub_andCond.addCond( createConditionC13DLowerBoundNonNeg, k1, k2, k3, -k4, "pos" );
+                    sub_andCond.addCond( createConditionC13DUpperBoundNonNeg, k1, k2, k3, 1 - k4, "pos" );
                     
                     orCond.addVar( sub_andCond );
                 end
@@ -1088,9 +1090,9 @@ function createViewFrustum(pos, right, up, front)
                 do
                     local sub_andCond = createConditionAND();
                     
-                    sub_andCond.addVar( createCondition2DLinearInequalityLT( -k1, -k2, -k3 ) );
-                    sub_andCond.addVar( createConditionC13DLowerBoundNonNeg( k1, k2, k3, 1 - k4, "neg" ) );
-                    sub_andCond.addVar( createConditionC13DUpperBoundNonNeg( k1, k2, k3, - k4, "neg" ) );
+                    sub_andCond.addCond( createCondition2DLinearInequalityLT, -k1, -k2, -k3 );
+                    sub_andCond.addCond( createConditionC13DLowerBoundNonNeg, k1, k2, k3, 1 - k4, "neg" );
+                    sub_andCond.addCond( createConditionC13DUpperBoundNonNeg, k1, k2, k3, - k4, "neg" );
                     
                     orCond.addVar( sub_andCond );
                 end
@@ -1111,17 +1113,17 @@ function createViewFrustum(pos, right, up, front)
         
         -- Collection of the default frustum bounds.
         -- c1 >= 0
-        globalconds.establishAND(createConditionC13DLowerBoundNonNeg( 0, 0, 1, 0, "pos" ));
+        globalconds.addCond( createConditionC13DLowerBoundNonNeg, 0, 0, 1, 0, "pos" );
         -- c1 <= 1
-        globalconds.establishAND( createConditionC13DUpperBoundNonNeg( 0, 0, 1, 1, "pos" ) );
+        globalconds.addCond( createConditionC13DUpperBoundNonNeg, 0, 0, 1, 1, "pos" );
         -- a1 >= -1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 1, 0, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, 1, 0, 1 );
         -- a1 <= 1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( -1, 0, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, -1, 0, 1 );
         -- b1 >= -1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 0, 1, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, 0, 1, 1 );
         -- b1 <= 1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 0, -1, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, 0, -1, 1 );
         
         return solveUniqueBoundaries(globalconds, doPrintDebug);
     end
@@ -1145,18 +1147,18 @@ function createViewFrustum(pos, right, up, front)
                 local orCond = createConditionOR();
                 
                 if (_math_eq(k4, 0)) then
-                    orCond.addVar(createConditionC13DEqualityNonNeg(0, 0, 1, 0));
-                    orCond.addVar(createCondition2DLinearInequalityLTEQ(k1, k2, k3));
+                    orCond.addCond(createConditionC13DEqualityNonNeg, 0, 0, 1, 0);
+                    orCond.addCond(createCondition2DLinearInequalityLTEQ, k1, k2, k3);
                 else
                     if (k4 > 0) then
-                        orCond.addVar(createCondition2DLinearEquality(k1, k2, k3));
+                        orCond.addCond(createCondition2DLinearEquality, k1, k2, k3);
                     end
                 
                     do
                         local sub_cond = createConditionAND();
                         
-                        sub_cond.addVar(createCondition2DLinearInequalityLT(k1, k2, k3));
-                        sub_cond.addVar(createConditionC13DLowerBoundNonNeg(k1, k2, k3, -k4, "pos"));
+                        sub_cond.addCond(createCondition2DLinearInequalityLT, k1, k2, k3);
+                        sub_cond.addCond(createConditionC13DLowerBoundNonNeg, k1, k2, k3, -k4, "pos");
                         
                         orCond.addVar(sub_cond);
                     end
@@ -1164,8 +1166,8 @@ function createViewFrustum(pos, right, up, front)
                     do
                         local sub_cond = createConditionAND();
                         
-                        sub_cond.addVar(createCondition2DLinearInequalityLT(-k1, -k2, -k3));
-                        sub_cond.addVar(createConditionC13DUpperBoundNonNeg(k1, k2, k3, -k4, "neg"));
+                        sub_cond.addCond(createCondition2DLinearInequalityLT, -k1, -k2, -k3);
+                        sub_cond.addCond(createConditionC13DUpperBoundNonNeg, k1, k2, k3, -k4, "neg");
                         
                         orCond.addVar(sub_cond);
                     end
@@ -1197,17 +1199,17 @@ function createViewFrustum(pos, right, up, front)
         
         -- Collection of the default frustum bounds.
         -- c1 >= 0
-        globalconds.establishAND(createConditionC13DLowerBoundNonNeg( 0, 0, 1, 0, "pos" ));
+        globalconds.addCond( createConditionC13DLowerBoundNonNeg, 0, 0, 1, 0, "pos" );
         -- c1 <= 1
-        globalconds.establishAND( createConditionC13DUpperBoundNonNeg( 0, 0, 1, 1, "pos" ) );
+        globalconds.addCond( createConditionC13DUpperBoundNonNeg, 0, 0, 1, 1, "pos" );
         -- a1 >= -1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 1, 0, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, 1, 0, 1 );
         -- a1 <= 1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( -1, 0, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, -1, 0, 1 );
         -- b1 >= -1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 0, 1, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, 0, 1, 1 );
         -- b1 <= 1
-        globalconds.establishAND( createCondition2DLinearInequalityLTEQ( 0, -1, 1 ) );
+        globalconds.addCond( createCondition2DLinearInequalityLTEQ, 0, -1, 1 );
         
         return solveUniqueBoundaries(globalconds, doPrintDebug);
     end

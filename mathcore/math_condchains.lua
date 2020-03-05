@@ -156,6 +156,14 @@ function createConditionAND(_initial_cond)
         end
     end
     
+    function cond.addCond(constructor, ...)
+        if (is_invalid) then
+            return;
+        end
+        
+        cond.addVar(constructor(...));
+    end
+    
     function cond.replaceVar(idx, replaceBy)
         if (is_invalid) then
             math_assert( false, "replaceVar error in and-dynamic: always false", 2 );
@@ -400,6 +408,14 @@ function createConditionOR(_initial_cond)
         if (event_handle_newVar(var, "add-var")) then
             tinsert(vars, var);
         end
+    end
+    
+    function cond.addCond(constructor, ...)
+        if (is_valid_straight) then
+            return;
+        end
+        
+        cond.addVar(constructor(...));
     end
     
     function cond.replaceVar(idx, replaceBy)
