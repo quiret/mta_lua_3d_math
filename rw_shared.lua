@@ -3,7 +3,7 @@
 -- in this file are optimized for comfort instead of performance.
 -- We do not implement reading "broken RW files" with their chunk sizes borked; fix them with
 -- public tools before loading them.
-local RW_DEBUG = false;
+local RW_DEBUG = true;
 
 local function _read_byte(filePtr)
     local numbytes = fileRead(filePtr, 1);
@@ -247,7 +247,7 @@ local function readStringChunk(filePtr)
     local non_zero_cnt = string.find(data, "\0");
     
     if (non_zero_cnt) then
-        return string.sub(data, 1, non_zero_cnt);
+        return string.sub(data, 1, non_zero_cnt - 1);
     end
     
     return data;
