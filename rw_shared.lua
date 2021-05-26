@@ -3,6 +3,7 @@
 -- in this file are optimized for comfort instead of performance.
 -- We do not implement reading "broken RW files" with their chunk sizes borked; fix them with
 -- public tools before loading them.
+local RW_DEBUG = false;
 
 local function _read_byte(filePtr)
     local numbytes = fileRead(filePtr, 1);
@@ -487,6 +488,13 @@ local function rwReadGeometry(filePtr)
         return false, "failed to read num morph targets";
     end
     
+    if (RW_DEBUG) then
+        outputDebugString( "formatFlags: " .. formatFlags );
+        outputDebugString( "numTriangles: " .. numTriangles );
+        outputDebugString( "numVertices: " .. numVertices );
+        outputDebugString( "numMorphTargets: " .. numMorphTargets );
+    end
+    
     -- What do we actually have?
     local is_tri_strip = bitTest(formatFlags, 0x00000001);
     local has_vertex_pos = bitTest(formatFlags, 0x00000002);
@@ -536,10 +544,10 @@ local function rwReadGeometry(filePtr)
     if (has_vertex_colors) then
         for iter=1,numVertices,1 do
             local vert = commondata_vertices[iter];
-            vert.red = _read_float32(filePtr);
-            vert.green = _read_float32(filePtr);
-            vert.blue =  _read_float32(filePtr);
-            vert.alpha = _read_float32(filePtr);
+            vert.red = _read_byte(filePtr);
+            vert.green = _read_byte(filePtr);
+            vert.blue =  _read_byte(filePtr);
+            vert.alpha = _read_byte(filePtr);
             
             if not (vert.red) or not (vert.green) or not (vert.blue) or not (vert.alpha) then
                 return false, "failed to read vertex color";
@@ -780,6 +788,10 @@ function rwReadClump(filePtr)
     
     if not (clumpMetaHeader) then
         return false, "failed to read clump meta header";
+    end
+    
+    if not (clumpMetaHeader.type == 0x01) then
+        return false, "not a struct chunk";
     end
     
     local num_atomics = _read_uint32(filePtr);

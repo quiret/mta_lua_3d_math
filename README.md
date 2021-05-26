@@ -11,6 +11,7 @@ After starting this resource you can execute the following commands for testing:
 
 * send_bbuf: draw a test scene defined at the top of math_server.lua
 * draw_model: renders a DFF file
+* tridraw: performs per-frame frustum checking of a triangle located at the middle of GTA:SA map
 
 ## External References
 

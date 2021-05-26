@@ -30,6 +30,7 @@ local has_condchain = has_condchain;
 local calculateDisambiguationCondition = calculateDisambiguationCondition;
 local simplify_by_distinguished_condition = simplify_by_distinguished_condition;
 local smart_group_condition = smart_group_condition;
+local layout_all_cases = layout_all_cases;
 
 if not (_math_eq) or not (_math_geq) or not (_math_leq) or
    not (createConditionBoolean) or not (math_assert) or
@@ -40,7 +41,7 @@ if not (_math_eq) or not (_math_geq) or not (_math_leq) or
    not (travel_and_line) or not (for_all_cases) or not (resolve_cond) or
    not (disect_conditions) or not (filter_conditions) or not (has_condchain) or
    not (calculateDisambiguationCondition) or not (simplify_by_distinguished_condition) or
-   not (smart_group_condition) then
+   not (smart_group_condition) or not (layout_all_cases) then
    
     error("failed to fetch global imports; fatal script error.");
 end
@@ -738,46 +739,6 @@ function createViewFrustum(pos, right, up, front)
         
         -- TODO: implement a removeVar method for and-dynamic and or-dynamic so that we can safely pick conditions
         -- out of a tree to later put it into a special transformed object.
-        
-        local function layout_all_cases(_condchain_try)
-            return for_all_andChains(_condchain_try,
-                function(condchain, parent, parentIdx)
-                    local orConds = {};
-                    local otherconds = createConditionAND(true);
-                    
-                    local function is_or_dynamic(solutionType)
-                        return ( solutionType == "or-dynamic" );
-                    end
-                    
-                    disect_conditions(condchain, { orConds }, otherconds, { is_or_dynamic } );
-                    
-                    if ( #orConds >= 1 ) then
-                        -- First we update all child or-dynamics.
-                        for _,orChild in ipairs(orConds) do
-                            for m,n in ipairs(orChild.getVars()) do
-                                if (has_condchain(n)) then
-                                    local layed_out = layout_all_cases(n);
-                                    orChild.replaceVar(m, layed_out);
-                                end
-                            end
-                        end
-                        
-                        -- We just want to clobber together.
-                        target_or = orConds[1].clone();
-                        
-                        for m=2,#orConds do
-                            target_or.distributeAND(orConds[m]);
-                        end
-                        
-                        target_or.distributeAND(otherconds);
-                        
-                        return "update-current", target_or;
-                    else
-                        return "next";
-                    end
-                end
-            );
-        end
         
         if (globalconds.getSolutionType() == "boolean") then
             if (doPrintDebug) then

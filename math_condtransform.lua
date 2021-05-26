@@ -99,7 +99,7 @@ function for_all_andChains(condchain, cb, parent, parentIdx)
             condchain = resolve_cond( userdata );
             
             if (parent) then
-                parent.replaceVar(parentIdx, condchain);
+                parent.replaceVar(parentIdx, nil, condchain);
                 ret_strat = "parent-update";
             end
             
@@ -127,7 +127,7 @@ function for_all_andChains(condchain, cb, parent, parentIdx)
                 
                 if (strat == "parent-update") then
                     if (parent) then
-                        parent.replaceVar(parentIdx, condchain);
+                        parent.replaceVar(parentIdx, nil, condchain);
                     end
                     
                     ret_strat = "parent-update";
@@ -396,7 +396,7 @@ local function reduceConditions(condchain, is_reducible_cb, reduce_by, doPrintDe
             
             if (strat == "parent-update") then
                 if (parent) then
-                    parent.replaceVar(parentIdx, condchain);
+                    parent.replaceVar(parentIdx, nil, condchain);
                 end
                 
                 ret_strat = "parent-update";
@@ -429,10 +429,10 @@ local function reduceConditions(condchain, is_reducible_cb, reduce_by, doPrintDe
                 has_unique_chain = true;
             end
             
-            local resReplace = condchain.replaceVar( n, reduced );
+            local resReplace = condchain.replaceVar( n, nil, reduced );
             
             if (parent) then
-                parent.replaceVar( parentIdx, condchain );
+                parent.replaceVar( parentIdx, nil, condchain );
                 ret_strat = "parent-update";
             end
             
@@ -633,3 +633,44 @@ local function smart_group_condition(cond, is_relevant_in_orCond, is_relevant_pl
     );
 end
 _G.smart_group_condition = smart_group_condition;
+
+local function layout_all_cases(_condchain_try)
+    return for_all_andChains(_condchain_try,
+        function(condchain, parent, parentIdx)
+            local orConds = {};
+            local otherconds = createConditionAND(true);
+            
+            local function is_or_dynamic(solutionType)
+                return ( solutionType == "or-dynamic" );
+            end
+            
+            disect_conditions(condchain, { orConds }, otherconds, { is_or_dynamic } );
+            
+            if ( #orConds >= 1 ) then
+                -- First we update all child or-dynamics.
+                for _,orChild in ipairs(orConds) do
+                    for m,n in ipairs(orChild.getVars()) do
+                        if (has_condchain(n)) then
+                            local layed_out = layout_all_cases(n);
+                            orChild.replaceVar(m, nil, layed_out);
+                        end
+                    end
+                end
+                
+                -- We just want to clobber together.
+                target_or = orConds[1].clone();
+                
+                for m=2,#orConds do
+                    target_or.distributeAND(orConds[m]);
+                end
+                
+                target_or.distributeAND(otherconds);
+                
+                return "update-current", target_or;
+            else
+                return "next";
+            end
+        end
+    );
+end
+_G.layout_all_cases = layout_all_cases;

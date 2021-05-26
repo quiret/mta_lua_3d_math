@@ -1,5 +1,6 @@
 <meta>
     <info type="util" name="" author="The_GTA" version="1.0" description="3d frustum non-linear render example resource"></info>
+    <script type="shared" src="shared.lua" />
     <script type="shared" src="math_shared_absmirr.lua"></script>
     <script type="shared" src="class.lua"></script>
     <script type="shared" src="threads.lua"></script>
@@ -11,6 +12,7 @@
     <script type="shared" src="mathcore/math_utilities.lua"></script>
     <script type="shared" src="mathcore/math_basiccond.lua"></script>
     <script type="shared" src="mathcore/math_condchains.lua"></script>
+    <script type="shared" src="math_condchains_linopt.lua" />
     <script type="shared" src="math_linearconds_2d.lua"></script>
     <script type="shared" src="math_condtransform.lua"></script>
     <script type="shared" src="math_shared.lua"></script>

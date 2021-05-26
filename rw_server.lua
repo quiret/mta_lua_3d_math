@@ -1,9 +1,10 @@
 -- Created by (c)The_GTA.
 -- TEST:
-local clumpStream = fileOpen("gfriend.dff");
+local dffname = "gfriend.dff";
+local clumpStream = fileOpen(dffname);
 
 if not (clumpStream) then
-    outputDebugString( "failed to open biker.dff" );
+    outputDebugString( "failed to open " .. dffname );
     return;
 end
 

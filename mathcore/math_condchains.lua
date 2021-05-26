@@ -11,7 +11,7 @@ local error = error;
 local createConditionBoolean = createConditionBoolean;
 
 if not (createConditionBoolean) then
-	error("cannot find required global imports; fatal script error.");
+    error("cannot find required global imports; fatal script error.");
 end
 
 local function createSeparatedConditionString(vars, sep)
@@ -112,8 +112,31 @@ function createConditionAND(_initial_cond)
         return "and";
     end
     
+    function cond.getVar(idx, userdata)
+        return vars[idx];
+    end
+    
+    function cond.getVarCount()
+        if (is_invalid) or (has_only_true) then
+            return 0;
+        end
+        
+        return #vars;
+    end
+    
+    function cond.forAllVars(cb)
+        if (is_invalid) or (has_only_true) then
+            return;
+        end
+        
+        for m,n in ipairs(vars) do
+            cb(m, nil, n);
+        end
+    end
+    
+    -- TODO: think about this, because I had a reason to suggest removal of this function.
     function cond.getVars()
-        if (has_only_true) or (is_invalid) then
+        if (is_invalid) or (has_only_true) then
             return {};
         end
         
@@ -164,7 +187,9 @@ function createConditionAND(_initial_cond)
         cond.addVar(constructor(...));
     end
     
-    function cond.replaceVar(idx, replaceBy)
+    function cond.replaceVar(idx, userdata, replaceBy)
+        -- userdata is unused, always pass it over as nil!
+    
         if (is_invalid) then
             math_assert( false, "replaceVar error in and-dynamic: always false", 2 );
         end
@@ -369,6 +394,28 @@ function createConditionOR(_initial_cond)
         vars = {};
     end
     
+    function cond.getVar(idx, userdata)
+        return vars[idx];
+    end
+    
+    function cond.getVarCount()
+        if (is_valid_straight) or (has_always_false) then
+            return 0;
+        end
+        
+        return #vars;
+    end
+    
+    function cond.forAllVars(cb)
+        if (is_valid_straight) or (has_always_false) then
+            return;
+        end
+        
+        for m,n in ipairs(vars) do
+            cb(m, nil, n);
+        end
+    end
+    
     function cond.getVars()
         if (is_valid_straight) or (has_always_false) then
             return {};
@@ -418,7 +465,9 @@ function createConditionOR(_initial_cond)
         cond.addVar(constructor(...));
     end
     
-    function cond.replaceVar(idx, replaceBy)
+    function cond.replaceVar(idx, userdata, replaceBy)
+        -- userdata is unused, always pass as nil!
+    
         if (is_valid_straight) then
             math_assert( false, "replaceVar error in or-dynamic: always true", 2 );
         end
